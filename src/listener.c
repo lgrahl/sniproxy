@@ -57,6 +57,12 @@ static int init_listener(struct Listener *, const struct Table_head *, struct ev
 static void listener_update(struct Listener *, struct Listener *,  const struct Table_head *);
 static void free_listener(struct Listener *);
 
+static const struct Protocol protocols[] = {
+        any_protocol,
+        http_protocol,
+        tls_protocol
+};
+static const size_t protocols_len = sizeof(protocols) / sizeof(protocols[0]);
 
 /*
  * Initialize each listener.
@@ -242,15 +248,14 @@ accept_listener_table_name(struct Listener *listener, char *table_name) {
 
 int
 accept_listener_protocol(struct Listener *listener, char *protocol) {
-    if (strncasecmp(protocol, http_protocol->name, strlen(protocol)) == 0)
-        listener->protocol = http_protocol;
-    else
-        listener->protocol = tls_protocol;
+    for (size_t i = 0; i < protocols_len; ++i) {
+        if (strncasecmp(protocol, protocols[i]->name, strlen(protocol)) == 0) {
+            listener->protocol = protocols[i];
+            break;
+        }
+    }
 
     if (address_port(listener->address) == 0) {
-        if (listener->protocol->default_port < 0) {
-            err("Port must be specified for protocol: %s", protocol);
-        }
         address_set_port(listener->address, listener->protocol->default_port);
     }
 
@@ -392,7 +397,7 @@ valid_listener(const struct Listener *listener) {
             return 0;
     }
 
-    if (listener->protocol != tls_protocol && listener->protocol != http_protocol) {
+    if (listener->protocol == NULL) {
         err("Invalid protocol");
         return 0;
     }
