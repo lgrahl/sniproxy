@@ -247,8 +247,12 @@ accept_listener_protocol(struct Listener *listener, char *protocol) {
     else
         listener->protocol = tls_protocol;
 
-    if (address_port(listener->address) == 0)
+    if (address_port(listener->address) == 0) {
+        if (listener->protocol->default_port < 0) {
+            err("Port must be specified for protocol: %s", protocol);
+        }
         address_set_port(listener->address, listener->protocol->default_port);
+    }
 
     return 1;
 }

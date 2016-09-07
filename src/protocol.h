@@ -28,7 +28,7 @@
 
 struct Protocol {
     const char *const name;
-    const int default_port;
+    const int default_port; /* protocols with port < 0 have no default port */
     int (*const parse_packet)(const char*, size_t, char **);
     const char *const abort_message;
     const size_t abort_message_len;
