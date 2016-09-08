@@ -46,8 +46,7 @@
 #include "logger.h"
 #include "binder.h"
 #include "protocol.h"
-#include "tls.h"
-#include "http.h"
+#include "protocols.h"
 
 
 static void close_listener(struct ev_loop *, struct Listener *);
@@ -56,13 +55,6 @@ static void backoff_timer_cb(struct ev_loop *, struct ev_timer *, int);
 static int init_listener(struct Listener *, const struct Table_head *, struct ev_loop *);
 static void listener_update(struct Listener *, struct Listener *,  const struct Table_head *);
 static void free_listener(struct Listener *);
-
-static const struct Protocol protocols[] = {
-        any_protocol,
-        http_protocol,
-        tls_protocol
-};
-static const size_t protocols_len = sizeof(protocols) / sizeof(protocols[0]);
 
 /*
  * Initialize each listener.
@@ -248,7 +240,8 @@ accept_listener_table_name(struct Listener *listener, char *table_name) {
 
 int
 accept_listener_protocol(struct Listener *listener, char *protocol) {
-    for (size_t i = 0; i < protocols_len; ++i) {
+    const struct Protocol * protocols[] = PROTOCOLS;
+    for (size_t i = 0; i < PROTOCOLS_LEN; ++i) {
         if (strncasecmp(protocol, protocols[i]->name, strlen(protocol)) == 0) {
             listener->protocol = protocols[i];
             break;
