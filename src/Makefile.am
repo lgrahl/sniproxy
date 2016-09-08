@@ -28,6 +28,7 @@ sniproxy_SOURCES = sniproxy.c \
                    logger.c \
                    logger.h \
                    protocol.h \
+                   protocols.h \
                    resolv.c \
                    resolv.h \
                    table.c \

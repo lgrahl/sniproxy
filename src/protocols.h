@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Dustin Lundquist <dustin@null-ptr.net>
+ * Copyright (c) 2016, Lennart Grahl <lennart.grahl@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -23,16 +23,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef PROTOCOL_H
-#define PROTOCOL_H
-#include <stdlib.h>
+#ifndef PROTOCOLS_H
+#define PROTOCOLS_H
 
-struct Protocol {
-    const char *const name;
-    const int default_port; /* protocols with port 0 have no default port */
-    int (*const parse_packet)(const char*, size_t, char **);
-    const char *const abort_message;
-    const size_t abort_message_len;
-};
+#include "any.h"
+#include "tls.h"
+#include "http.h"
+
+#define PROTOCOLS {\
+    any_protocol,\
+    tls_protocol,\
+    http_protocol,\
+}
+#define PROTOCOLS_LEN 3
 
 #endif

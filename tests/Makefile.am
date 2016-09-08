@@ -2,6 +2,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/src -g $(LIBEV_CFLAGS) $(LIBPCRE_CFLAGS) $(LIBUDNS
 
 TESTS = http_test \
         tls_test \
+        any_test \
         buffer_test \
         table_test \
         address_test \
@@ -24,6 +25,7 @@ endif
 
 check_PROGRAMS = http_test \
                  tls_test \
+                 any_test \
                  table_test \
                  binder_test \
                  buffer_test \
@@ -36,6 +38,12 @@ http_test_SOURCES = http_test.c \
                     ../src/http.c
 
 tls_test_SOURCES = tls_test.c \
+                   ../src/tls.c \
+                   ../src/logger.c
+
+any_test_SOURCES = any_test.c \
+                   ../src/any.c \
+                   ../src/http.c \
                    ../src/tls.c \
                    ../src/logger.c
 
@@ -68,6 +76,7 @@ config_test_SOURCES = config_test.c \
                       ../src/logger.c \
                       ../src/resolv.c \
                       ../src/resolv.h \
+                      ../src/any.c \
                       ../src/tls.c \
                       ../src/http.c
 

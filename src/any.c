@@ -33,17 +33,13 @@
 #include "protocol.h"
 #include "logger.h"
 
+#include "tls.h" /* TODO: Get protocols from the config */
+#include "http.h" /* TODO: Get protocols from the config */
+
 static int parse_any_header(const char *, size_t, char **);
-static void set_abort_message(size_t pos);
 
+/* TODO: Needs to be replaced by a callback */
 static const char dummy_response[] = "";
-
-/* The protocols will be tried out in the defined order */
-static const struct Protocol protocols[] = {
-        tls_protocol,
-        http_protocol
-};
-static const size_t protocols_len = sizeof(protocols) / sizeof(protocols[0]);
 
 static const struct Protocol any_protocol_st = {
     .name = "any",
@@ -53,7 +49,6 @@ static const struct Protocol any_protocol_st = {
     .abort_message_len = sizeof(dummy_response)
 };
 const struct Protocol *const any_protocol = &any_protocol_st;
-
 
 /* Pass any data to the specified possible protocols.
  *
@@ -72,19 +67,25 @@ parse_any_header(const char *data, size_t data_len, char **hostname) {
     size_t no_host_header_included = -1;
     size_t incomplete_request = -1;
 
+    /* TODO: Get protocols from the config */
+    const struct Protocol * protocols[] = {
+        tls_protocol,
+        http_protocol,
+    };
+
     if (hostname == NULL)
         return -3;
 
     /* Try out specified protocols */
-    for (size_t i = 0; i < protocols_len; ++i) {
-        code = protocols[i].parse_packet(data, hostname);
+    for (size_t i = 0; i < 2; ++i) {
+        code = protocols[i]->parse_packet(data, data_len, hostname);
 
         /* Stop in case...
          * >= 0: the protocol has accepted the data.
          * -3:   of invalid hostname pointer.
          * -4:   of malloc failure. */
         if (code >= 0 || code == -3 || code == -4) {
-            set_abort_message(i);
+//            set_abort_message(i);
             return code;
         }
 
@@ -101,18 +102,13 @@ parse_any_header(const char *data, size_t data_len, char **hostname) {
 
     /* Did someone say no host header included? */
     if (no_host_header_included != -1) {
-        set_abort_message(no_host_header_included);
+//        set_abort_message(no_host_header_included);
         return -2;
     }
 
     /* Did someone say incomplete request? */
     if (incomplete_request != -1) {
-        set_abort_message(incomplete_request);
+//        set_abort_message(incomplete_request);
         return -1;
     }
-}
-
-static void set_abort_message(size_t pos) {
-    any_protocol->abort_message = protocols[pos].abort_message;
-    any_protocol->abort_message_len = protocols[pos].abort_message_len;
 }
